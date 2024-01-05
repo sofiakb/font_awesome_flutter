@@ -69,9 +69,9 @@ final AnsiPen yellow = AnsiPen()..xterm(011);
 ///   1.1 download official, free icons.json from github
 ///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/metadata/icons.json
 ///   1.2 download official, free icons and replace existing
-///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/webfonts/fa-brands-400.woff2
-///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/webfonts/fa-regular-400.woff2
-///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/webfonts/fa-solid-900.woff2
+///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/webfonts/fa-brands-400.ttf
+///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/webfonts/fa-regular-400.ttf
+///     https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/webfonts/fa-solid-900.ttf
 /// 3. filter out unwanted icon styles
 /// 4. build icons, example
 /// if dynamic icons requested:
@@ -110,14 +110,14 @@ void main(List<String> rawArgs) async {
         'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/metadata/icons.json',
         File('lib/fonts/icons.json'));
     await download(
-        'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/webfonts/fa-brands-400.woff2',
-        File('lib/fonts/fa-brands-400.woff2'));
+        'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/webfonts/fa-brands-400.ttf',
+        File('lib/fonts/fa-brands-400.ttf'));
     await download(
-        'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/webfonts/fa-regular-400.woff2',
-        File('lib/fonts/fa-regular-400.woff2'));
+        'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/webfonts/fa-regular-400.ttf',
+        File('lib/fonts/fa-regular-400.ttf'));
     await download(
-        'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/webfonts/fa-solid-900.woff2',
-        File('lib/fonts/fa-solid-900.woff2'));
+        'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/webfonts/fa-solid-900.ttf',
+        File('lib/fonts/fa-solid-900.ttf'));
   } else {
     print(blue('Custom icons.json found, generating files'));
   }
