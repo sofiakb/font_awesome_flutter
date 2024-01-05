@@ -48,3 +48,6 @@ flutter:
       fonts:
         - asset: lib/fonts/fa-thin-100.woff2
           weight: 100
+
+scripts:
+  release: ./scripts/release.sh
