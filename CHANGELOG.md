@@ -1,3 +1,12 @@
+## 1.0.6 (sofiakb)
+
+* Flutter 3.47 compatibility: `IconData` is now `final`, so icons are declared as
+  plain `IconData(..., fontFamily: ..., fontPackage: 'font_awesome_flutter')`.
+* BREAKING: the `IconDataSolid`, `IconDataRegular`, `IconDataLight`, `IconDataThin`,
+  `IconDataBrands` and `IconDataDuotone` classes (lib/src/icon_data.dart) are removed.
+* Configurator updated to generate plain `IconData`.
+* Tag 1.0.5 is an incomplete commit (only the deletions), do not use it.
+
 ## 10.1.0
 
 * Upgrade to Font Awesome 6.1.1

@@ -104,8 +104,7 @@ void main(List<String> rawArgs) async {
     const repositoryName = 'FortAwesome/Font-Awesome';
     final defaultBranch = await getRepositoryDefaultBranch(repositoryName);
     print(blue(
-        'Choosing branch "$defaultBranch" of repository https://github.com/' +
-            repositoryName));
+        'Choosing branch "$defaultBranch" of repository https://github.com/$repositoryName'));
     await download(
         'https://raw.githubusercontent.com/FortAwesome/Font-Awesome/$defaultBranch/metadata/icons.json',
         File('lib/fonts/icons.json'));
@@ -232,7 +231,7 @@ void adjustPubspecFontIncludes(Set<String> styles) {
 /// Comments out a line of yaml code. Does nothing if already commented
 String commentYamlLine(String line) {
   if (line.startsWith('#')) return line;
-  return '#' + line;
+  return '#$line';
 }
 
 /// Uncomments a line of yaml code. Does nothing if not commented.
@@ -290,9 +289,6 @@ to complete successfully.
     '/// name starting with `fa-`. Should multiple classes fulfill these',
     '/// requirements, the first occurrence is chosen.',
     '///',
-    '/// Returns duotone icons as IconData. Please cast them back to',
-    '/// [IconDataDuotone] via `getIconFromCss(...) as IconDataDuotone`.',
-    '/// ',
     '/// Returns [FontAwesomeIcons.questionCircle] if no icon matches.',
     'IconData getIconFromCss(String cssClasses) {',
     '  const Map<String, String> cssStyles = {',
@@ -348,7 +344,7 @@ to complete successfully.
   output.addAll([
     '',
     '/// Icon name to icon mapping for duotone font awesome icons',
-    'const Map<String, IconDataDuotone> faIconNameMappingDuotone = {',
+    'const Map<String, IconData> faIconNameMappingDuotone = {',
   ]);
 
   for (var icon in icons) {
@@ -394,9 +390,7 @@ List<String> generateIconDefinitionClass(
     'library font_awesome_flutter;',
     '',
     "import 'package:flutter/widgets.dart';",
-    "import 'package:font_awesome_flutter/src/icon_data.dart';",
     "export 'package:font_awesome_flutter/src/fa_icon.dart';",
-    "export 'package:font_awesome_flutter/src/icon_data.dart';",
   ];
 
   if (hasDuotoneIcons) {
@@ -476,12 +470,13 @@ String generateIconDefinition(IconMetadata icon, String style) {
         .toRadixString(16)
         .toString();
 
-    return 'static const IconDataDuotone $iconName = IconDataDuotone(0x${icon.unicode}, secondary: IconDataDuotone(0x$secondaryUnicode),);';
+    // IconData is final since Flutter 3.47: the secondary glyph of a duotone
+    // icon is exposed as its own constant instead of a subclass field.
+    return 'static const IconData $iconName = ${iconDataSource(icon.unicode, style)};\n'
+        'static const IconData ${iconName}Secondary = ${iconDataSource(secondaryUnicode, style)};';
   }
 
-  String iconDataSource = styleToDataSource(style);
-
-  return 'static const IconData $iconName = $iconDataSource(0x${icon.unicode});';
+  return 'static const IconData $iconName = ${iconDataSource(icon.unicode, style)};';
 }
 
 /// Generates aliases which link to the original icon. Used by
@@ -518,9 +513,17 @@ String normalizeIconName(String iconName, String style, int styleCompetitors) {
   return iconName.camelCase;
 }
 
-/// Utility function to generate the correct 'IconData' subclass for a [style]
-String styleToDataSource(String style) {
-  return 'IconData${style[0].toUpperCase()}${style.substring(1)}';
+/// Generates the 'IconData' constructor call for a [unicode] code point in a
+/// [style]. IconData is final since Flutter 3.47, so no subclass is used: the
+/// style only selects the font family.
+String iconDataSource(String unicode, String style) {
+  return "IconData(0x$unicode, fontFamily: '${styleToFontFamily(style)}', "
+      "fontPackage: 'font_awesome_flutter')";
+}
+
+/// Returns the font family declared in pubspec.yaml for a [style]
+String styleToFontFamily(String style) {
+  return 'FontAwesome${style[0].toUpperCase()}${style.substring(1)}';
 }
 
 /// Gets the default branch from github's metadata
@@ -530,7 +533,7 @@ String styleToDataSource(String style) {
 /// using the latest version, this tool always selects the default branch.
 Future<String> getRepositoryDefaultBranch(String repositoryName) async {
   final tmpFile = File('fa-repo-metadata.tmp');
-  await download('https://api.github.com/repos/' + repositoryName, tmpFile);
+  await download('https://api.github.com/repos/$repositoryName', tmpFile);
   try {
     String rawGithubMetadata = await tmpFile.readAsString();
     Map<String, dynamic> githubMetadata = json.decode(rawGithubMetadata);
@@ -552,10 +555,10 @@ Future printVersionNotice(String repositoryName) async {
     final packageVersion = pub.Version.parse(getPackageVersion());
 
     print(blue(
-        'Using font_awesome_flutter version ' + packageVersion.toString()));
+        'Using font_awesome_flutter version $packageVersion'));
 
     await download(
-        'https://api.github.com/repos/' + repositoryName + '/releases',
+        'https://api.github.com/repos/$repositoryName/releases',
         tmpFile);
 
     String rawReleasesData = await tmpFile.readAsString();
@@ -584,17 +587,11 @@ Future printVersionNotice(String repositoryName) async {
     final primaryPreRelease = pub.Version.primary(preReleases);
 
     if (primaryRelease > packageVersion) {
-      print(red('A new version (' +
-          primaryRelease.toString() +
-          ') of font_awesome_flutter is available. Please update before reporting any errors. You can update via `git pull` or by downloading the source code from github. (https://github.com/' +
-          repositoryName +
-          ')'));
+      print(red('A new version ($primaryRelease) of font_awesome_flutter is available. Please update before reporting any errors. You can update via `git pull` or by downloading the source code from github. (https://github.com/$repositoryName)'));
     }
     if (primaryPreRelease > packageVersion &&
         primaryPreRelease > primaryRelease) {
-      print(yellow('A pre-release version (' +
-          primaryPreRelease.toString() +
-          ') of font_awesome_flutter is available. Should you encounter any problems, have a look if it fixes them.'));
+      print(yellow('A pre-release version ($primaryPreRelease) of font_awesome_flutter is available. Should you encounter any problems, have a look if it fixes them.'));
     }
   } on FormatException catch (_) {
     print(red(

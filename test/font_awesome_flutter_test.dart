@@ -1,16 +1,24 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
-    final awesome = Awesome();
+  group('FontAwesomeIcons', () {
+    test('icons are plain IconData bound to the style font family', () {
+      const cases = <(IconData, String)>[
+        (FontAwesomeIcons.solidZero, 'FontAwesomeSolid'),
+        (FontAwesomeIcons.zero, 'FontAwesomeRegular'),
+        (FontAwesomeIcons.lightZero, 'FontAwesomeLight'),
+        (FontAwesomeIcons.thinZero, 'FontAwesomeThin'),
+        (FontAwesomeIcons.github, 'FontAwesomeBrands'),
+      ];
 
-    setUp(() {
-      // Additional setup goes here.
-    });
-
-    test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
+      for (final (icon, family) in cases) {
+        expect(icon.runtimeType, IconData);
+        expect(icon.fontFamily, family);
+        expect(icon.fontPackage, 'font_awesome_flutter');
+      }
+      expect(FontAwesomeIcons.solidZero.codePoint, 0x30);
     });
   });
 }
